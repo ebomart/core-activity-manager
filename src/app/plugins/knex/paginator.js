@@ -13,14 +13,14 @@ const EXCLUDED_ATTR_FROM_COUNT = [
 ];
 
 function paginate({
-  pageSize = PAGE_SIZE,
-  currentPage = CURRENT_PAGE,
+  page_size = PAGE_SIZE,
+  current_page = CURRENT_PAGE,
   distinctWith
 }) {
   const countByQuery = this.clone();
 
-  const page = Math.max(currentPage || 1);
-  const offset = (page - 1) * pageSize;
+  const page = Math.max(current_page || 1);
+  const offset = (page - 1) * page_size;
 
   /**
    * Remove statements that will make things bad with count
@@ -39,17 +39,17 @@ function paginate({
 
   return Promise.all([
     countByQuery.first(),
-    this.offset(offset).limit(pageSize)
+    this.offset(offset).limit(page_size)
   ]).then(([counter, result]) => {
     const total = Number(counter.total);
     return {
       data: result,
       meta: {
         pagination: {
-          total,
-          page,
-          page_size: pageSize,
-          total_pages: Math.ceil(total / pageSize)
+          total_items: total,
+          current_page: page,
+          page_size,
+          total_pages: Math.ceil(total / page_size)
         }
       }
     };

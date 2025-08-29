@@ -4,18 +4,19 @@
 environment:
   name: prod
 
-replicaCount: 1
+replicaCount: 2
 version: v1
 
 autoscaling:
   enabled: true
   minReplicas: 2
-  maxReplicas: 10
+  maxReplicas: 5
   targetCPUUtilizationPercentage: 80
   targetMemoryUtilizationPercentage: 80
 
 image:
-  repository: us-docker.pkg.dev/ibo-platform-components/us.gcr.io/<name>
+  repository: us-docker.pkg.dev/kpn-platform-components/us.gcr.io/core-activity-manager
+  tag: $IMAGE_TAG
   pullPolicy: IfNotPresent
   pullSecret:
     enabled: true
@@ -39,9 +40,10 @@ ingress:
     {}
     # kubernetes.io/ingress.class: nginx
   # kubernetes.io/tls-acme: "true"
-  uriPrefix: /users/
+  uriPrefix: /activity-manager/
   hosts:
-    - services.ibo.com
+    - services.kpnfarmfresh.com
+    - services.kpnfresh.com
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
@@ -76,13 +78,12 @@ podAntiAffinity:
   enabled: true
 
 environmentVariables:
-  DB_CONNECTION_TIMEOUT: 60000
-  DB_STATEMENT_TIMEOUT: 30000
-  DB_MAX_CONNECTION: 20
-  DB_MIN_CONNECTION: 2
-  LOG_LEVEL: "debug"
-  CLOUD_BUCKET_NAME: "some-name"
-  DATASTORE_NAMESPACE: "some-namespace"
+  ENVIRONMENT: PROD
+  CORE_USER_SERVICE_URI: http://core-users-services.core-commerce.svc.cluster.local
+  ACTIVITY_MANAGER_QUEUE: activity-manager-queue
+  LOG_LEVEL: error
+  GCP_ZONE: "asia-south1"
+  SERVICE_BASE_URL: "https://services.kpnfresh.com/activity-manager"
 
 gcp:
   enabled: false
@@ -101,4 +102,5 @@ destinationPolicy:
 
 jwt_policy:
   enabled: true
-  audience: https://services.ibo.com
+  audience: https://services.kpnfarmfresh.com
+  jwksUri: https://storage.googleapis.com/kpn-jwt-prod/jwks.json

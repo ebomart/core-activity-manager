@@ -8,7 +8,7 @@ const createHttpCloudTask =
     url,
     queue,
     payload,
-    delayInSeconds = 10,
+    delayInSeconds = 5,
     httpMethod = "POST"
   }) => {
     const parent = client.queuePath(project, location, queue || default_queue);
@@ -17,24 +17,24 @@ const createHttpCloudTask =
       scheduleTime: { seconds: delayInSeconds + Date.now() / 1000 },
       httpRequest: {
         httpMethod,
+        headers: {
+          "Content-Type": "application/json"
+        },
         url,
         ...(payload && {
-          body: Buffer.from(JSON.stringify(payload)).toString("base64"),
-          headers: {
-            "Content-Type": "application/json"
-          }
+          body: Buffer.from(JSON.stringify(payload)).toString("base64")
         })
       }
     };
 
-    fastify.log.info({
+    fastify.log.debug({
       message: "Cloud Task Request Details:",
       log_trace: logTrace,
       task_details: task
     });
     const request = { parent, task };
     const [response] = await client.createTask(request);
-    fastify.log.info({
+    fastify.log.debug({
       message: "Created task Response Details",
       log_trace: logTrace,
       response

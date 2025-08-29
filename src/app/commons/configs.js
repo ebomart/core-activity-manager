@@ -1,9 +1,10 @@
 const SWAGGER_CONFIGS = {
   routePrefix: "/documentation",
+  mode: "dynamic",
   openapi: {
     info: {
-      title: "IBO User Service",
-      description: "API Docs for the IBO User Service",
+      title: "Core Activity Manager",
+      description: "API Docs for the Core Activity Manager",
       version: "0.1.0"
     },
     externalDocs: {
@@ -12,23 +13,35 @@ const SWAGGER_CONFIGS = {
     },
     servers: [
       {
-        url: "https://services-dev.ibo.com/something",
-        description: "Development server"
-      },
-      {
-        url: "https://services-staging.ibo.com/something",
+        url: "https://services-staging.kpnfarmfresh.com/activity-manager",
         description: "Staging server"
       },
       {
-        url: "https://services.ibo.com/something",
+        url: "https://services.kpnfarmfresh.com/activity-manager",
         description: "Production server"
       }
     ],
-    schemes: ["https"],
-    produces: ["application/json"],
-    tags: [{ name: "IBO User API's" }]
+    tags: [{ name: "Core Activity Manager API's" }]
+  }
+};
+
+const SWAGGER_UI_CONFIGS = {
+  routePrefix: "/documentation",
+  initOAuth: {},
+  uiConfig: {
+    docExpansion: "list",
+    deepLinking: false
   },
-  exposeRoute: true
+  uiHooks: {
+    onRequest(request, reply, next) {
+      next();
+    },
+    preHandler(request, reply, next) {
+      next();
+    }
+  },
+  staticCSP: true,
+  transformStaticCSP: header => header
 };
 
 // eslint-disable-next-line complexity
@@ -95,19 +108,23 @@ const SERVER_CONFIGS = {
       }
     },
     level: process.env.LOG_LEVEL || "info",
-    prettyPrint:
-      process.env.NODE_ENV === "development"
-        ? {
-            colorize: true,
-            levelFirst: true
-          }
-        : false
+    ...(process.env.NODE_ENV === "development" && {
+      transport: {
+        target: "pino-pretty",
+        options: {
+          colorize: true,
+          levelFirst: true
+        }
+      }
+    })
   },
   disableRequestLogging: true,
+  exposeHeadRoutes: false,
   keepAliveTimeout: 10000
 };
 
 module.exports = {
   SWAGGER_CONFIGS,
-  SERVER_CONFIGS
+  SERVER_CONFIGS,
+  SWAGGER_UI_CONFIGS
 };

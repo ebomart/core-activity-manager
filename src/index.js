@@ -3,20 +3,19 @@ const fastifyEnv = require("@fastify/env");
 const fastifyHealthcheck = require("fastify-healthcheck");
 const envSchema = require("env-schema");
 const swagger = require("@fastify/swagger");
+const swaggerUi = require("@fastify/swagger-ui");
 const fastifyMetrics = require("fastify-metrics");
 
 const { envSchema: schema } = require("./app/commons/schemas/envSchemas");
 const { knexConfig } = require("../config/index");
-const routes = require("./app/ibo-users/routes");
+const activityTemplateRoutes = require("./app/activity-template/routes");
+const activityRoutes = require("./app/activity/routes");
 
 // PLUGINS
 const ajv = require("./app/plugins/ajv");
-const memCache = require("./app/plugins/mem-cache");
 const knex = require("./app/plugins/knex");
-const readGcpSecret = require("./app/plugins/readGcpSecret");
 const httpClient = require("./app/plugins/httpClient");
-const pubsub = require("./app/plugins/pubsub");
-const cloudBucket = require("./app/plugins/cloudBucket");
+const cloudTask = require("./app/plugins/cloudTask");
 
 const {
   extractLogTrace,
@@ -24,20 +23,24 @@ const {
   responseLogging
 } = require("./app/hooks/logging");
 
-const { SWAGGER_CONFIGS, SERVER_CONFIGS } = require("./app/commons/configs");
+const {
+  SWAGGER_CONFIGS,
+  SWAGGER_UI_CONFIGS,
+  SERVER_CONFIGS
+} = require("./app/commons/configs");
 const { METRICS_CONFIGS } = require("./app/commons/metrics.config");
 
 const { errorHandler } = require("./app/errorHandler");
 
-function create() {
+async function create() {
   // eslint-disable-next-line global-require
   const fastify = require("fastify")(SERVER_CONFIGS);
 
   fastify.setErrorHandler(errorHandler());
-  fastify.register(fastifyHealthcheck);
+  await fastify.register(fastifyHealthcheck);
 
   // Env vars plugin
-  fastify.register(fastifyEnv, {
+  await fastify.register(fastifyEnv, {
     dotenv: true,
     schema
   });
@@ -45,31 +48,35 @@ function create() {
   // HOOKS
   fastify.addHook("onRequest", extractLogTrace);
   fastify.addHook("preValidation", requestLogging);
-  fastify.addHook("onSend", responseLogging);
+  fastify.addHook("onResponse", responseLogging);
 
   // PLUGINS
-  fastify.register(ajv);
-  fastify.register(httpClient);
-  fastify.register(knex, knexConfig);
-  fastify.register(memCache);
-  fastify.register(readGcpSecret);
-  fastify.register(swagger, SWAGGER_CONFIGS);
-  fastify.register(pubsub);
-  fastify.register(cloudBucket);
+  await fastify.register(ajv);
+  await fastify.register(httpClient);
+  await fastify.register(knex, knexConfig);
+  await fastify.register(swagger, SWAGGER_CONFIGS);
+  await fastify.register(swaggerUi, SWAGGER_UI_CONFIGS);
+  await fastify.register(cloudTask);
 
   // ROUTES
-  fastify.register(routes, { prefix: "/v1" });
+  await fastify.register(activityTemplateRoutes, {
+    prefix: "/v1/activity-templates"
+  });
+
+  await fastify.register(activityRoutes, {
+    prefix: "/v1/activities"
+  });
 
   // Fastify-metrics
   if (process.env.NODE_ENV !== "test") {
-    fastify.register(fastifyMetrics, METRICS_CONFIGS);
+    await fastify.register(fastifyMetrics, METRICS_CONFIGS);
   }
 
   return fastify;
 }
 
 async function start() {
-  const fastify = create();
+  const fastify = await create();
   const defaultSchema = {
     type: "object",
     properties: {
@@ -85,7 +92,7 @@ async function start() {
   };
   const config = envSchema({ schema: defaultSchema, dotenv: true });
   // Run the server!
-  fastify.listen(config.PORT, config.HOST, (err, address) => {
+  fastify.listen({ port: config.PORT, host: config.HOST }, (err, address) => {
     /* istanbul ignore next */
     if (err) {
       fastify.log.error(err);

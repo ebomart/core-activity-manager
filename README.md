@@ -1,6 +1,10 @@
-# IBO Core NodeJs Fastify Template
+# Core Activity Manager
 
-This APP is to be used as a template while developing any NodeJS Service using Fastify Framework
+Use of this APP:
+
+- is to Create Activity Template and publish it to various outlets.
+- Once Acitivities are created, it can be completed by end users having required roles.
+- if the activity is not completed till expiry time of activity, the activity will marked as LAPSED and no further action can be taken on that acitivity.
 
 Application for better compatibility needs to run with:
 

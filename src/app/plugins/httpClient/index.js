@@ -1,6 +1,5 @@
 const fp = require("fastify-plugin");
 const httpClient = require("./axios");
-const graphQlClient = require("./urql");
 const Metrics = require("./metrics");
 const { CustomError } = require("../../errorHandler");
 
@@ -110,112 +109,7 @@ const httpClientWrapper =
     }
   };
 
-// eslint-disable-next-line complexity
-const graphQlClientWrapper = fastify => {
-  // eslint-disable-next-line complexity
-  return async ({
-    url,
-    headers,
-    method = "POST",
-    mutation,
-    query,
-    path,
-    source_system,
-    domain,
-    functionality,
-    downstream_system
-  }) => {
-    const template = mutation || query;
-    const templateKey = mutation ? "mutation" : "query";
-    const common = {
-      request: {
-        url,
-        method,
-        path,
-        data: {
-          [templateKey]: template.template.loc.source.body,
-          bindings: template.binding
-        },
-        headers
-      },
-      log_trace: getTraceHeadersFromHeaders(headers),
-      downstream_system: downstream_system || "Magento",
-      source_system,
-      domain,
-      functionality
-    };
-
-    fastify.log.info({ ...common, message: "GraphQL Request Context:" });
-
-    const mInstance = Metrics.init({
-      status_code: 200,
-      method,
-      route: path
-    });
-
-    try {
-      const { data, error } = await graphQlClient({
-        url,
-        headers,
-        mutation,
-        query
-      });
-      if (!error) {
-        mInstance.updateStatus(200).consume();
-        fastify.log.info({
-          ...common,
-          response: {
-            data,
-            response_time: mInstance.getResponseTime(),
-            status_code: 200
-          },
-          message: `GraphQL Response Context:`
-        });
-        return data;
-      }
-      const { status_code, errors } =
-        CustomError.getStatusCodeAndErrorFromMagentoError(error);
-      mInstance.updateStatus(status_code).consume();
-      fastify.log.error({
-        ...common,
-        response: {
-          error: errors,
-          raw_error: error,
-          response_time: mInstance.getResponseTime(),
-          status_code
-        },
-        message: `GraphQL Response Context:`
-      });
-      throw new CustomError(status_code, errors);
-    } catch (error) {
-      mInstance.updateStatus(error?.response?.status || 500).consume();
-      if (!(error instanceof CustomError)) {
-        fastify.log.error({
-          ...common,
-          response: {
-            error: error?.response?.data,
-            response_time: mInstance.getResponseTime(),
-            status_code: error?.response?.status || 500,
-            raw_error: error
-          },
-          message: "GraphQL Response Context:"
-        });
-      }
-
-      if (error?.response?.status) {
-        throw CustomError.createHttpError({
-          httpCode: error.response.status,
-          errorResponse: error.response.data,
-          downstream_system
-        });
-      }
-      throw error;
-    }
-  };
-};
-
 const httpClientPlugin = async fastify => {
   fastify.decorate("request", httpClientWrapper(fastify));
-  fastify.decorate("graphQl", graphQlClientWrapper(fastify));
 };
 module.exports = fp(httpClientPlugin);

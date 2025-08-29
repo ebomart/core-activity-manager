@@ -7,7 +7,7 @@ const headers = {
     "x-channel-id": {
       type: "string",
       default: "WEB",
-      enum: ["APP", "WEB", "STORE", "IOS"],
+      enum: ["AND", "WEB", "STORE", "IOS", "COMMAND-CENTER"],
       description: "Example values: 'APP'"
     }
   }
@@ -26,4 +26,43 @@ const auditSchema = {
   }
 };
 
-exports.commonRequestSchemas = [auditSchema, headers];
+const customInfo = {
+  $id: "request-custom-info",
+  type: "array",
+  items: {
+    type: "object",
+    additionalProperties: false,
+    properties: {
+      group: { type: "string" },
+      id: { type: "string" },
+      values: { type: "array", items: { type: "string" } },
+      additional_info: { type: "object" }
+    }
+  }
+};
+
+const allowedChannel = {
+  $id: "request-allowed-channel",
+  type: "string",
+  enum: ["ONLINE", "STORE", "OMNI"],
+  default: "OMNI"
+};
+
+const quantity = {
+  $id: "request-quantity",
+  type: "object",
+  additionalProperties: false,
+  required: ["quantity_number", "quantity_uom"],
+  properties: {
+    quantity_number: { type: "integer" },
+    quantity_uom: { type: "string" }
+  }
+};
+
+exports.commonRequestSchemas = [
+  auditSchema,
+  headers,
+  customInfo,
+  allowedChannel,
+  quantity
+];

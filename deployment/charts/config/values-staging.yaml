@@ -15,7 +15,8 @@ autoscaling:
   targetMemoryUtilizationPercentage: 80
 
 image:
-  repository: us-docker.pkg.dev/ibo-platform-components/us.gcr.io/<name>
+  repository: us-docker.pkg.dev/kpn-platform-components/us.gcr.io/core-activity-manager
+  tag: $IMAGE_TAG
   pullPolicy: IfNotPresent
   pullSecret:
     enabled: true
@@ -39,9 +40,10 @@ ingress:
     {}
     # kubernetes.io/ingress.class: nginx
   # kubernetes.io/tls-acme: "true"
-  uriPrefix: /users/
+  uriPrefix: /activity-manager/
   hosts:
-    - services-staging.ibo.com
+    - services-staging.kpnfarmfresh.com
+    - services-staging.kpnfresh.com
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
@@ -80,13 +82,12 @@ podAntiAffinity:
   enabled: false
 
 environmentVariables:
-  DB_CONNECTION_TIMEOUT: 60000
-  DB_STATEMENT_TIMEOUT: 30000
-  DB_MAX_CONNECTION: 20
-  DB_MIN_CONNECTION: 2
-  LOG_LEVEL: "debug"
-  CLOUD_BUCKET_NAME: "some-name"
-  DATASTORE_NAMESPACE: "some-namespace"
+  ENVIRONMENT: STAGING
+  CORE_USER_SERVICE_URI: http://core-users-services.core-commerce.svc.cluster.local
+  LOG_LEVEL: debug
+  ACTIVITY_MANAGER_QUEUE: activity-manager-queue
+  GCP_ZONE: "asia-south1"
+  SERVICE_BASE_URL: "https://services-staging.kpnfresh.com/activity-manager"
 
 gcp:
   enabled: false
@@ -105,4 +106,5 @@ destinationPolicy:
 
 jwt_policy:
   enabled: true
-  audience: https://services-staging.ibo.com
+  audience: https://services-staging.kpnfarmfresh.com
+  jwksUri: https://storage.googleapis.com/kpn-jwt-staging/jwks.json

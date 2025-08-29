@@ -21,11 +21,18 @@ exports.envSchema = {
       type: "string",
       default: "5432"
     },
-    DATASTORE_NAMESPACE: {
+    CORE_USER_SERVICE_URI: {
       type: "string"
     },
-    CLOUD_BUCKET_NAME: {
-      type: "string"
-    }
+    ACTIVITY_MANAGER_QUEUE: {
+      type: "string",
+      default: "activity-manager-queue"
+    },
+    GCP_ZONE: { type: "string", default: "asia-south1" },
+    GCP_PROJECT_ID: {
+      type: "string",
+      default: "kpn-staging-380605"
+    },
+    SERVICE_BASE_URL: { type: "string" }
   }
 };

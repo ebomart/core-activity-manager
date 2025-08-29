@@ -40,13 +40,35 @@ module.exports = class CustomError extends Error {
   static createHttpError({ httpCode, errorResponse, downstream_system }) {
     const errors = [];
     switch (downstream_system) {
-      case "some-service":
-        // Add downstream service specific Error Parsing Logic here
-        errors.push({
-          code: `SOME_SERVICE_${STATUS_CODES[httpCode]}`,
-          message: errorResponse?.message
-        });
+      case "core-user-service":
+        if (errorResponse.errors) {
+          // eslint-disable-next-line max-depth
+          if (httpCode === 400) {
+            errorResponse.errors.forEach(err => {
+              errors.push({
+                code: `${downstream_system}_${err.code}`,
+                message: err.message,
+                property: err.property
+              });
+            });
+          } else {
+            errorResponse.errors.forEach(err => {
+              errors.push({
+                code: `${downstream_system}_${err.code}`,
+                message: err.message
+              });
+            });
+          }
+        } else {
+          errors.push({
+            code: `${downstream_system}_${
+              STATUS_CODES[errorResponse.statusCode]
+            }`,
+            message: errorResponse.statusMessage
+          });
+        }
         break;
+
       default:
         errors.push({
           code: "INTERNAL_SERVER_ERROR",

@@ -6,13 +6,13 @@ ARG NPM_TOKEN
 
 COPY . /app
 
-RUN addgroup ibo && \
+RUN addgroup kpn && \
     adduser \
     --disabled-password \
     --gecos "" \
     --no-create-home \
-    -G ibo  \
-    ibo
+    -G kpn  \
+    kpn
 
 # Upstream bug with hadolint ordering
 # hadolint ignore=DL4006

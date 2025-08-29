@@ -20,4 +20,62 @@ const auditSchema = {
   }
 };
 
-exports.commonResponseSchemas = [amountSchema, auditSchema];
+const customInfo = {
+  $id: "response-custom-info",
+  type: "array",
+  items: {
+    type: "object",
+    properties: {
+      group: { type: "string" },
+      id: { type: "string" },
+      values: { type: "array", items: { type: "string" } },
+      additional_info: { type: "object" }
+    }
+  }
+};
+
+const pagination = {
+  $id: "response-pagination",
+  type: "object",
+  properties: {
+    current_page: { type: "integer" },
+    page_size: { type: "integer" },
+    total_items: { type: "integer" },
+    total_pages: { type: "integer" }
+  }
+};
+
+const quantity = {
+  $id: "response-quantity",
+  type: "object",
+  properties: {
+    quantity_number: { type: "integer" },
+    quantity_uom: { type: "string" }
+  }
+};
+
+const activity_evidences = {
+  $id: "response-activity-evidences",
+  type: "array",
+  items: {
+    type: "object",
+    properties: {
+      evidence_type: {
+        type: "string",
+        enum: ["GEO-LOCATION", "IMAGE"]
+      },
+      is_evidence_mandatory: {
+        type: "boolean"
+      }
+    }
+  }
+};
+
+exports.commonResponseSchemas = [
+  amountSchema,
+  auditSchema,
+  customInfo,
+  pagination,
+  quantity,
+  activity_evidences
+];

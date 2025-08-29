@@ -15,7 +15,8 @@ const {
 const defaultAjvSettngs = {
   allErrors: true,
   removeAdditional: false,
-  useDefaults: true
+  useDefaults: true,
+  coerceTypes: true
 };
 const defaultKeywords = ["transform", "uniqueItemProperties"];
 
