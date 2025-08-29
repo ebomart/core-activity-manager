@@ -19,7 +19,7 @@
     "ajv-keywords": "^5.1.0",
     "axios": "^1.6.3",
     "env-schema": "^5.2.0",
-    "fastify": "^4.15.0",
+    "fastify": "^4.29.1",
     "fastify-healthcheck": "^4.4.0",
     "fastify-metrics": "^10.3.0",
     "http-status-codes": "^2.2.0",
