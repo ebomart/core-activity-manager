@@ -1,0 +1,125 @@
+name: DEV - Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  GKE_PROJECT: ${{ secrets.GCP_PROJECT_ID_DEV }}
+  GCR_GKE_PROJECT: ibo-platform-components
+  GITHUB_SHA: ${{ github.sha }}
+  GKE_ZONE: asia-south1
+  IMAGE: ibo-user-service
+  REPOSITORY : us.gcr.io
+  REGISTRY_HOSTNAME: us-docker.pkg.dev
+  APP_NAME: ibo-user-service
+
+jobs:
+  node-build-deploy:
+    runs-on: core-app
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Dockerfile Lint
+        uses: hadolint/hadolint-action@v1.5.0
+        with:
+          dockerfile: Dockerfile
+
+      - id: "auth"
+        uses: "google-github-actions/auth@v1"
+        with:
+          credentials_json: ${{ secrets.GOOGLE_PRIVATE_KEY_DEV }}
+
+      - id: "get-credentials"
+        uses: "google-github-actions/get-gke-credentials@v0"
+        with:
+          cluster_name: ${{ secrets.GKE_CLUSTER_DEV }}
+          project_id: ${{ secrets.GCP_PROJECT_ID_DEV }}
+          location: "asia-south1"
+
+        # Install helm
+      - name: Install Helm
+        run: |
+          curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+
+      - name: Get the deployment file
+        run: helm template $IMAGE deployment/charts/$IMAGE -f deployment/charts/$IMAGE/values.yaml --output-dir opa
+
+      - name: OPA Kubernetes
+        uses: ebomart/opa-kubernetes@v2.1.16
+        with:
+          file: opa/ibo-user-service/templates/deployment.yaml
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          # cache: 'npm'
+          # cache-dependency-path: '**/package-lock.json'
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@ebomart"
+
+      - name: Update to npm 8.x
+        run: npm i -g npm@8
+
+      # - name: Remove .npmrc
+      #   run: rm -rf .npmrc
+
+      - name: Install dependencies
+        run: npm install --ignore-scripts
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # - name: Restore .npmrc
+      #   run: git checkout .npmrc
+
+      - name: Run post install scripts
+        run: npm rebuild && npm run prepare --if-present
+
+      - name: Code Linting
+        run: npm run lint
+
+      - name: Unit Test
+        run: npm run test:unit
+
+      - name: Dependency Checks
+        run: npm audit
+
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@v1.0.0
+        with:
+          projectBaseDir: .
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+      - name: SonarQube Quality Gate check
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        # Force to fail step after specific time
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: build-login-publish-docker image
+        uses: ebomart/build-publish-docker@main
+        with:
+          registry_host: $REGISTRY_HOSTNAME
+          gke_project: $GCR_GKE_PROJECT
+          image_name: $IMAGE
+          google_private_key: ${{ secrets.GOOGLE_PRIVATE_KEY_DEV }}
+          sha: ${{ github.sha }}
+          docker_build_args: "--build-arg NPM_TOKEN=$NPM_TOKEN"
+          npm_token: ${{ secrets.NPM_TOKEN }}
+
+      # Deploy the Docker image to the GKE cluster
+      - name: Deploy
+        env:
+          HELM_OPTS: --set-string environmentVariables.GCP_PROJECT_ID=${{ secrets.GCP_PROJECT_ID_DEV }}
+        run: |
+          helm upgrade --install --wait ibo-user-service deployment/charts/$APP_NAME --namespace user $HELM_OPTS --set image.tag=$GITHUB_SHA -f deployment/charts/config/values-dev.yaml

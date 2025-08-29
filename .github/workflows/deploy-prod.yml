@@ -1,0 +1,74 @@
+name: PROD - Build and Deploy
+
+on:
+  release:
+    types: [published]
+
+# on:
+#   push:
+#     tags:
+#       - "v*"
+#     inputs:
+#       logLevel:
+#         description: "environment"
+#         required: true
+#         default: prod
+
+# on:
+#   workflow_dispatch:
+#     inputs:
+#       logLevel:
+#         description: 'environment'
+#         required: true
+#         default: prod
+
+env:
+  GKE_PROJECT: ${{ secrets.GCP_PROJECT_ID_PRD }}
+  GCR_GKE_PROJECT: ibo-platform-components
+  GITHUB_SHA: ${{ github.sha }}
+  GKE_ZONE: asia-south1
+  IMAGE: ibo-user-service
+  REPOSITORY : us.gcr.io
+  REGISTRY_HOSTNAME: us-docker.pkg.dev
+  APP_NAME: ibo-user-service
+
+jobs:
+  node-build-deploy:
+    runs-on: core-app
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: build-login-publish-docker image
+        uses: ebomart/build-publish-docker-artifact@main
+        with:
+          registry_host: $REGISTRY_HOSTNAME
+          repository: $REPOSITORY
+          gke_project: $GCR_GKE_PROJECT
+          image_name: $IMAGE
+          google_private_key: ${{ secrets.GOOGLE_PRIVATE_KEY_PRD }}
+          sha: ${{ github.sha }}
+          docker_build_args: "--build-arg NPM_TOKEN=$NPM_TOKEN"
+          npm_token: ${{ secrets.NPM_TOKEN }}
+
+      - id: "get-credentials"
+        uses: "google-github-actions/get-gke-credentials@v0"
+        with:
+          cluster_name: ${{ secrets.GKE_CLUSTER_PRD }}
+          project_id: ${{ secrets.GCP_PROJECT_ID_PRD }}
+          location: "asia-south1"
+
+      # Install helm
+      - name: Install Helm
+        run: |
+          curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+      # Deploy the Docker image to the GKE cluster
+      - name: Deploy
+        env:
+          HELM_OPTS: --set-string environmentVariables.GCP_PROJECT_ID=${{ secrets.GCP_PROJECT_ID_PRD }}
+        run: |
+          helm upgrade --install --wait ibo-user-service deployment/charts/$APP_NAME --namespace user $HELM_OPTS --set image.tag=$GITHUB_SHA -f deployment/charts/config/values-prod.yaml

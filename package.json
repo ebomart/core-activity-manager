@@ -1,0 +1,82 @@
+{
+  "name": "ibo-user-service",
+  "version": "1.0.0",
+  "description": "IBO user service",
+  "main": "src/index.js",
+  "author": "",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git"
+  },
+  "dependencies": {
+    "@fastify/env": "^3.0.0",
+    "@fastify/swagger": "^6.0.1",
+    "@google-cloud/datastore": "^7.0.0",
+    "@google-cloud/pubsub": "^3.0.1",
+    "@google-cloud/secret-manager": "^4.0.0",
+    "@google-cloud/storage": "^6.2.0",
+    "@google-cloud/tasks": "^3.0.0",
+    "@urql/core": "^3.1.1",
+    "ajv-errors": "^3.0.0",
+    "ajv-formats": "^2.1.1",
+    "ajv-keywords": "^5.0.0",
+    "axios": "^0.24.0",
+    "cross-fetch": "^3.1.5",
+    "env-schema": "^0.1.0",
+    "fastify": "^3.24.0",
+    "fastify-healthcheck": "^3.1.0",
+    "fastify-metrics": "^8.0.0",
+    "http-status-codes": "^2.2.0",
+    "knex": "^0.95.9",
+    "node-cache": "^5.1.2",
+    "pg": "^8.7.1",
+    "uuid": "^8.3.2"
+  },
+  "engines": {
+    "node": ">=10.*"
+  },
+  "os": [
+    "darwin",
+    "linux"
+  ],
+  "devDependencies": {
+    "eslint": "^7.30.0",
+    "eslint-config-airbnb-base": "^14.1.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-prettier": "^3.4.0",
+    "fs-extra": "^8.1.0",
+    "husky": "^7.0.4",
+    "inquirer": "^7.0.3",
+    "jest": "^27.0.6",
+    "jest-sonar-reporter": "^2.0.0",
+    "lint-staged": "^10.1.7",
+    "nodemon": "^2.0.16",
+    "pino-pretty": "^7.0.1",
+    "prettier": "^2.3.2"
+  },
+  "eslintIgnore": [
+    "node_modules/*",
+    "coverage/*",
+    ".nyc_output/*"
+  ],
+  "jest": {
+    "clearMocks": true,
+    "collectCoverage": true,
+    "coverageDirectory": "coverage",
+    "testEnvironment": "node",
+    "testResultsProcessor": "jest-sonar-reporter"
+  },
+  "scripts": {
+    "lint": "eslint . -c .eslintrc.json --ext js --fix",
+    "lint:fix": "npm run lint -- --fix",
+    "start:dev": "NODE_ENV=development nodemon -e js index | pino-pretty -c -t -l severity",
+    "start": "node --max-http-header-size 24000 src/index",
+    "test:unit": "LOG_LEVEL=silent jest -c jest.config.unit.js",
+    "knex": "node -r dotenv/config ./node_modules/.bin/knex",
+    "migrate:make": "npm run knex -- migrate:make --knexfile ./config/knexConfig.js",
+    "migrate": "npm run knex -- migrate:latest --knexfile ./config/knexConfig.js",
+    "migrate:down": "npm run knex -- migrate:down --knexfile ./config/knexConfig.js",
+    "prepare": "husky install"
+  }
+}
