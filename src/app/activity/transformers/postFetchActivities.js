@@ -1,6 +1,6 @@
 const momentTimezone = require("moment-timezone");
 
-const groupAcivitiesByOutletIdAndAcitivityDate = input => {
+const groupAcivitiesByNodeIdAndAcitivityDate = input => {
   const ACTIVITY_STATUS_PRIO = ["PENDING", "LAPSED", "COMPLETED"];
 
   // Sort Input Based on PRio
@@ -11,11 +11,11 @@ const groupAcivitiesByOutletIdAndAcitivityDate = input => {
       a.activity_start_datetime - b.activity_start_datetime
   );
 
-  const outletPlusActvtyDateWisemap = {};
+  const nodePlusActvtyDateWisemap = {};
 
   sortedInput.forEach(activity => {
     const {
-      outlet_id,
+      node_id,
       activity_date,
       start_time,
       expiry_time,
@@ -26,9 +26,9 @@ const groupAcivitiesByOutletIdAndAcitivityDate = input => {
 
     const formattedDate = momentTimezone(activity_date).format("YYYY-MM-DD");
 
-    const key = `${outlet_id}_${formattedDate}`;
-    if (Object.hasOwnProperty.call(outletPlusActvtyDateWisemap, key)) {
-      outletPlusActvtyDateWisemap[key].activities.push({
+    const key = `${node_id}_${formattedDate}`;
+    if (Object.hasOwnProperty.call(nodePlusActvtyDateWisemap, key)) {
+      nodePlusActvtyDateWisemap[key].activities.push({
         ...restProps,
         checklist_count: checklist_template.length,
         start_time: start_time.slice(0, 5),
@@ -36,8 +36,8 @@ const groupAcivitiesByOutletIdAndAcitivityDate = input => {
         end_by_time: end_by_time.slice(0, 5)
       });
     } else {
-      outletPlusActvtyDateWisemap[key] = {
-        outlet_id,
+      nodePlusActvtyDateWisemap[key] = {
+        node_id,
         activity_date: formattedDate,
         activities: [
           {
@@ -52,7 +52,7 @@ const groupAcivitiesByOutletIdAndAcitivityDate = input => {
     }
   });
 
-  return Object.values(outletPlusActvtyDateWisemap);
+  return Object.values(nodePlusActvtyDateWisemap);
 };
 
-module.exports = { groupAcivitiesByOutletIdAndAcitivityDate };
+module.exports = { groupAcivitiesByNodeIdAndAcitivityDate };

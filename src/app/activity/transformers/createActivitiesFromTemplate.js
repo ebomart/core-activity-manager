@@ -5,25 +5,25 @@ const {
 } = require("../helpers/createActivitiesFromTemplate");
 const { getAuditInfo } = require("../../commons/helpers");
 
-const getAcitivitiesForAllOutlets = ({
+const getAcitivitiesForAllNodes = ({
   acitvityList,
-  outlet_ids,
+  node_ids,
   activity_template_id,
   activity_name,
   expiry_time,
   activity_duration_in_mins,
   audit
 }) => {
-  return outlet_ids.flatMap(outlet_id => {
+  return node_ids.flatMap(node_id => {
     return acitvityList.map(val => {
       return {
         activity_id: uuidV5(
-          `${activity_template_id}_${outlet_id}_${val.activity_date}`,
+          `${activity_template_id}_${node_id}_${val.activity_date}`,
           uuidV5.URL
         ),
         activity_template_id,
         activity_name,
-        outlet_id,
+        node_id,
         activity_date: val.activity_date,
         start_time: val.start_time,
         end_by_time: val.end_by_time,
@@ -41,7 +41,7 @@ const getAcitivitiesForAllOutlets = ({
 
 const getTransformedListOfAcitivitiesFromTemplate = ({
   template,
-  outlet_ids
+  node_ids
 }) => {
   const {
     type,
@@ -69,9 +69,9 @@ const getTransformedListOfAcitivitiesFromTemplate = ({
       start_time,
       end_by_time
     });
-    return getAcitivitiesForAllOutlets({
+    return getAcitivitiesForAllNodes({
       acitvityList,
-      outlet_ids,
+      node_ids,
       activity_template_id,
       activity_name,
       expiry_time,
@@ -85,9 +85,9 @@ const getTransformedListOfAcitivitiesFromTemplate = ({
     start_time,
     end_by_time
   });
-  return getAcitivitiesForAllOutlets({
+  return getAcitivitiesForAllNodes({
     acitvityList,
-    outlet_ids,
+    node_ids,
     activity_template_id,
     activity_name,
     expiry_time,

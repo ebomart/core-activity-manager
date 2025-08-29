@@ -12,9 +12,9 @@ const postActivityStatus = {
   },
   body: {
     type: "object",
-    required: ["outlet_id", "user_id", "checklist", "status"],
+    required: ["node_id", "user_id", "checklist", "status"],
     properties: {
-      outlet_id: { type: "string", minLength: 1 }, // for validation
+      node_id: { type: "string", minLength: 1 }, // for validation
       user_id: { type: "string", format: "uuid" },
       activity_evidence: {
         type: "object",

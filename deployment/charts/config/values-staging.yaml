@@ -15,7 +15,7 @@ autoscaling:
   targetMemoryUtilizationPercentage: 80
 
 image:
-  repository: us-docker.pkg.dev/kpn-platform-components/us.gcr.io/core-activity-manager
+  repository: us-docker.pkg.dev/ibo-platform-components/us.gcr.io/core-activity-manager
   tag: $IMAGE_TAG
   pullPolicy: IfNotPresent
   pullSecret:
@@ -42,8 +42,7 @@ ingress:
   # kubernetes.io/tls-acme: "true"
   uriPrefix: /activity-manager/
   hosts:
-    - services-staging.kpnfarmfresh.com
-    - services-staging.kpnfresh.com
+    - services-staging.ibo.com
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
@@ -87,7 +86,7 @@ environmentVariables:
   LOG_LEVEL: debug
   ACTIVITY_MANAGER_QUEUE: activity-manager-queue
   GCP_ZONE: "asia-south1"
-  SERVICE_BASE_URL: "https://services-staging.kpnfresh.com/activity-manager"
+  SERVICE_BASE_URL: "https://services-staging.ibo.com/activity-manager"
 
 gcp:
   enabled: false
@@ -106,5 +105,5 @@ destinationPolicy:
 
 jwt_policy:
   enabled: true
-  audience: https://services-staging.kpnfarmfresh.com
-  jwksUri: https://storage.googleapis.com/kpn-jwt-staging/jwks.json
+  audience: https://services-staging.ibo.com
+  jwksUri: https://ebomart.us.auth0.com/.well-known/jwks.json

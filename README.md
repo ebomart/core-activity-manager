@@ -2,7 +2,7 @@
 
 Use of this APP:
 
-- is to Create Activity Template and publish it to various outlets.
+- is to Create Activity Template and publish it to various nodes.
 - Once Acitivities are created, it can be completed by end users having required roles.
 - if the activity is not completed till expiry time of activity, the activity will marked as LAPSED and no further action can be taken on that acitivity.
 

@@ -121,7 +121,7 @@ const getActivityTemplateById = {
             }
           }
         },
-        published_outlet_ids: {
+        published_node_ids: {
           type: "array",
           items: { type: "string" }
         },

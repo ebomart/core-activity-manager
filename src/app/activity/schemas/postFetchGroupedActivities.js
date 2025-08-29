@@ -7,9 +7,9 @@ const postFetchGroupedActivities = {
   body: {
     type: "object",
     minProperties: 1,
-    required: ["user_id", "outlet_id", "activity_date"],
+    required: ["user_id", "node_id", "activity_date"],
     properties: {
-      outlet_id: { type: "string", minLength: 1 },
+      node_id: { type: "string", minLength: 1 },
       activity_date: { type: "string", format: "date" },
       user_id: { type: "string", format: "uuid" },
       include_checklist_template: { type: "boolean", default: true },
@@ -29,7 +29,7 @@ const postFetchGroupedActivities = {
       items: {
         type: "object",
         properties: {
-          outlet_id: { type: "string" },
+          node_id: { type: "string" },
           activity_date: { type: "string" },
           grouped_activities: {
             type: "array",

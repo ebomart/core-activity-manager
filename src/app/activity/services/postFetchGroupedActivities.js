@@ -2,7 +2,7 @@ const activityRepo = require("../repository/activity");
 const downstreamCallsRepo = require("../repository/downstreamCalls");
 
 const {
-  groupAcivitiesByOutletIdAndAcitivityDateWithActivitySlot
+  groupAcivitiesByNodeIdAndAcitivityDateWithActivitySlot
 } = require("../transformers/postFetchGroupedActivities");
 
 function postFetchGroupedActivitiesService(fastify) {
@@ -13,7 +13,7 @@ function postFetchGroupedActivitiesService(fastify) {
   const { getUserRoleById } = downstreamCallsRepo(fastify);
   return async ({ body, logTrace }) => {
     const {
-      outlet_id,
+      node_id,
       activity_date,
       user_id,
       statuses,
@@ -28,7 +28,7 @@ function postFetchGroupedActivitiesService(fastify) {
         fastify.knex,
         {
           input: {
-            outlet_id,
+            node_id,
             activity_date,
             statuses,
             categories,
@@ -38,13 +38,13 @@ function postFetchGroupedActivitiesService(fastify) {
         }
       );
 
-      const groupedResponseByOutletIdAndAcitivityDate =
-        groupAcivitiesByOutletIdAndAcitivityDateWithActivitySlot(
+      const groupedResponseByNodeIdAndAcitivityDate =
+        groupAcivitiesByNodeIdAndAcitivityDateWithActivitySlot(
           templateResponse,
           categories
         );
 
-      return groupedResponseByOutletIdAndAcitivityDate;
+      return groupedResponseByNodeIdAndAcitivityDate;
     }
 
     const roles_names = roles.map(({ role_name }) => role_name);
@@ -52,7 +52,7 @@ function postFetchGroupedActivitiesService(fastify) {
     const templateResponse =
       await getGroupedActivityListWithFilterByUserRole.call(fastify.knex, {
         input: {
-          outlet_id,
+          node_id,
           activity_date,
           user_roles: roles_names,
           statuses,
@@ -62,12 +62,12 @@ function postFetchGroupedActivitiesService(fastify) {
         logTrace
       });
 
-    const groupedResponseByOutletIdAndAcitivityDate =
-      groupAcivitiesByOutletIdAndAcitivityDateWithActivitySlot(
+    const groupedResponseByNodeIdAndAcitivityDate =
+      groupAcivitiesByNodeIdAndAcitivityDateWithActivitySlot(
         templateResponse,
         categories
       );
-    return groupedResponseByOutletIdAndAcitivityDate;
+    return groupedResponseByNodeIdAndAcitivityDate;
   };
 }
 module.exports = postFetchGroupedActivitiesService;

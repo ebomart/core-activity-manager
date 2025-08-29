@@ -2,7 +2,7 @@ const activityRepo = require("../repository/activity");
 const downstreamCallsRepo = require("../repository/downstreamCalls");
 
 const {
-  groupAcivitiesByOutletIdAndAcitivityDate
+  groupAcivitiesByNodeIdAndAcitivityDate
 } = require("../transformers/postFetchActivities");
 
 function postFetchActivitiesService(fastify) {
@@ -11,7 +11,7 @@ function postFetchActivitiesService(fastify) {
   const { getUserRoleById } = downstreamCallsRepo(fastify);
   return async ({ body, logTrace }) => {
     const {
-      outlet_id,
+      node_id,
       activity_date_from,
       activity_date_to,
       user_id,
@@ -27,7 +27,7 @@ function postFetchActivitiesService(fastify) {
         fastify.knex,
         {
           input: {
-            outlet_id,
+            node_id,
             activity_date_from,
             activity_date_to,
             statuses,
@@ -38,9 +38,9 @@ function postFetchActivitiesService(fastify) {
         }
       );
 
-      const groupedResponseByOutletIdAndAcitivityDate =
-        groupAcivitiesByOutletIdAndAcitivityDate(templateResponse);
-      return groupedResponseByOutletIdAndAcitivityDate;
+      const groupedResponseByNodeIdAndAcitivityDate =
+        groupAcivitiesByNodeIdAndAcitivityDate(templateResponse);
+      return groupedResponseByNodeIdAndAcitivityDate;
     }
 
     const roles_names = roles.map(({ role_name }) => role_name);
@@ -49,7 +49,7 @@ function postFetchActivitiesService(fastify) {
       fastify.knex,
       {
         input: {
-          outlet_id,
+          node_id,
           activity_date_from,
           activity_date_to,
           user_roles: roles_names,
@@ -61,9 +61,9 @@ function postFetchActivitiesService(fastify) {
       }
     );
 
-    const groupedResponseByOutletIdAndAcitivityDate =
-      groupAcivitiesByOutletIdAndAcitivityDate(templateResponse);
-    return groupedResponseByOutletIdAndAcitivityDate;
+    const groupedResponseByNodeIdAndAcitivityDate =
+      groupAcivitiesByNodeIdAndAcitivityDate(templateResponse);
+    return groupedResponseByNodeIdAndAcitivityDate;
   };
 }
 module.exports = postFetchActivitiesService;

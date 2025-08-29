@@ -10,7 +10,7 @@ function createActivitiesFromTemplateService(fastify) {
   const { insertActivitiesInBatches } = activityRepo(fastify);
 
   return async ({ body, logTrace }) => {
-    const { activity_template_id, outlet_ids } = body;
+    const { activity_template_id, node_ids } = body;
 
     const templateResponse = await getActivityTemplateById.call(fastify.knex, {
       activity_template_id,
@@ -19,7 +19,7 @@ function createActivitiesFromTemplateService(fastify) {
 
     const transformedActivities = getTransformedListOfAcitivitiesFromTemplate({
       template: templateResponse,
-      outlet_ids
+      node_ids
     });
 
     const knexTrx = await fastify.knex.transaction();

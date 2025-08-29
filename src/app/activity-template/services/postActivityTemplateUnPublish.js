@@ -1,15 +1,15 @@
 const activityRepo = require("../../activity/repository/activity");
 
 function postActivityTemplateUnPublishService(fastify) {
-  const { deleteFutureActivitiesByActivityTemplateIdAndOutletIds } =
+  const { deleteFutureActivitiesByActivityTemplateIdAndNodeIds } =
     activityRepo(fastify);
 
   return async ({ body, params, logTrace }) => {
     const { activity_template_id } = params;
-    const { outlet_ids } = body;
-    await deleteFutureActivitiesByActivityTemplateIdAndOutletIds.call(
+    const { node_ids } = body;
+    await deleteFutureActivitiesByActivityTemplateIdAndNodeIds.call(
       fastify.knex,
-      { activity_template_id, outlet_ids, logTrace }
+      { activity_template_id, node_ids, logTrace }
     );
     return { success: true };
   };

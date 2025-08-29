@@ -10,11 +10,11 @@ function postActivityTemplatePublishService(fastify) {
 
   return async ({ body, params, logTrace }) => {
     const { activity_template_id } = params;
-    const { outlet_ids } = body;
+    const { node_ids } = body;
     await postActivityTemplateUnPublish({ body, params, logTrace });
 
     await createActivitiesFromTemplate({
-      body: { activity_template_id, outlet_ids },
+      body: { activity_template_id, node_ids },
       logTrace
     });
     return { success: true };

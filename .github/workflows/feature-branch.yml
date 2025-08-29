@@ -9,10 +9,10 @@ env:
   GKE_PROJECT: ${{ secrets.GCP_PROJECT_ID_DEV }}
   GITHUB_SHA: ${{ github.sha }}
   GKE_ZONE: asia-south1
-  IMAGE: ibo-user-service
+  IMAGE: core-activity-manager
   REPOSITORY : us.gcr.io
   REGISTRY_HOSTNAME: us-docker.pkg.dev
-  APP_NAME: ibo-user-service
+  APP_NAME: core-activity-manager
 
 jobs:
   node-build-deploy:
@@ -36,7 +36,7 @@ jobs:
       - name: OPA Kubernetes
         uses: ebomart/opa-kubernetes@v2.1.16
         with:
-          file: opa/ibo-user-service/templates/deployment.yaml
+          file: opa/core-activity-manager/templates/deployment.yaml
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3

@@ -2,7 +2,7 @@ const { errorSchemas } = require("../../commons/schemas/errorSchemas");
 
 const postActivityTemplatePublish = {
   tags: ["ACTIVITY-TEMPLATE"],
-  summary: "This API is to publish activity template to outlets",
+  summary: "This API is to publish activity template to nodes",
   headers: { $ref: "request-headers#" },
   params: {
     type: "object",
@@ -13,10 +13,10 @@ const postActivityTemplatePublish = {
   },
   body: {
     type: "object",
-    required: ["outlet_ids"],
+    required: ["node_ids"],
     additionalProperties: false,
     properties: {
-      outlet_ids: {
+      node_ids: {
         type: "array",
         minItems: 1,
         items: {

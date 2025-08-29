@@ -87,7 +87,7 @@ function getCategoryMetadataMap(data) {
   });
 }
 
-const groupAcivitiesByOutletIdAndAcitivityDateWithActivitySlot = (
+const groupAcivitiesByNodeIdAndAcitivityDateWithActivitySlot = (
   activities,
   categories
 ) => {
@@ -98,7 +98,7 @@ const groupAcivitiesByOutletIdAndAcitivityDateWithActivitySlot = (
   const metadata = getCategoryMetadataMap(activities);
 
   const finalResult = {
-    outlet_id: activities[0]?.outlet_id,
+    node_id: activities[0]?.node_id,
     activity_date: momentTimezone(activities[0]?.activity_date).format(
       "YYYY-MM-DD"
     ),
@@ -111,4 +111,4 @@ const groupAcivitiesByOutletIdAndAcitivityDateWithActivitySlot = (
   return [finalResult];
 };
 
-module.exports = { groupAcivitiesByOutletIdAndAcitivityDateWithActivitySlot };
+module.exports = { groupAcivitiesByNodeIdAndAcitivityDateWithActivitySlot };

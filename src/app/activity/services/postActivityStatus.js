@@ -114,7 +114,7 @@ function postFetchActivitiesService(fastify) {
   return async ({ params, body, logTrace }) => {
     const { activity_id } = params;
     const {
-      outlet_id,
+      node_id,
       user_id,
 
       activity_evidence,
@@ -163,7 +163,7 @@ function postFetchActivitiesService(fastify) {
     await updateActivityById.call(fastify.knex, {
       activity_id,
       input: {
-        outlet_id,
+        node_id,
         completed_by: user_id,
         completed_at: momentTimezone(new Date().toISOString())
           .tz("Asia/Calcutta")

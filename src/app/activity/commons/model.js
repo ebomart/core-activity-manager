@@ -4,7 +4,7 @@ const ACTIVITY = {
     ACTIVITY_ID: "activity_id",
     ACTIVITY_TEMPLATE_ID: "activity_template_id",
     ACTIVITY_NAME: "activity_name",
-    OUTLET_ID: "outlet_id",
+    NODE_ID: "node_id",
     ACTIVITY_DATE: "activity_date",
     START_TIME: "start_time",
     END_BY_TIME: "end_by_time",

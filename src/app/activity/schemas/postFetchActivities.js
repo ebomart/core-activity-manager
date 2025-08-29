@@ -9,7 +9,7 @@ const postFetchActivities = {
     minProperties: 1,
     required: ["user_id"],
     properties: {
-      outlet_id: { type: "string", minLength: 1 },
+      node_id: { type: "string", minLength: 1 },
       activity_date_from: { type: "string", format: "date" },
       activity_date_to: { type: "string", format: "date" },
       user_id: { type: "string", format: "uuid" },
@@ -30,7 +30,7 @@ const postFetchActivities = {
       items: {
         type: "object",
         properties: {
-          outlet_id: { type: "string" },
+          node_id: { type: "string" },
           activity_date: { type: "string" },
           activities: {
             type: "array",

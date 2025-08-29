@@ -24,7 +24,7 @@ function createActivityTemplateService(fastify) {
   const { insertActivityChecklist, deleteChecklistByActivityTemplateId } =
     activityChecklistRepo(fastify);
 
-  const { getDistinctOutletIdsByActivityTemplateId } = activityRepo(fastify);
+  const { getDistinctNodeIdsByActivityTemplateId } = activityRepo(fastify);
 
   const postActivityTemplatePublish =
     postActivityTemplatePublishService(fastify);
@@ -81,7 +81,7 @@ function createActivityTemplateService(fastify) {
     updatedAudit,
     escalation,
     activity_evidences,
-    outlet_ids,
+    node_ids,
     start_time,
     logTrace
   }) => {
@@ -112,15 +112,15 @@ function createActivityTemplateService(fastify) {
 
       await knexTrx.commit();
 
-      if (outlet_ids.length) {
+      if (node_ids.length) {
         // await postActivityTemplateUnPublish({
-        //   body: { outlet_ids },
+        //   body: { node_ids },
         //   params: { activity_template_id },
         //   logTrace
         // });
         // Create cloud task to do this
         await postActivityTemplatePublish({
-          body: { outlet_ids },
+          body: { node_ids },
           params: { activity_template_id },
           logTrace
         });
@@ -182,7 +182,7 @@ function createActivityTemplateService(fastify) {
     });
 
     const updatedAudit = getAuditInfoForUpdate({ audit });
-    const outletIsArr = await getDistinctOutletIdsByActivityTemplateId.call(
+    const nodeIsArr = await getDistinctNodeIdsByActivityTemplateId.call(
       fastify.knex,
       {
         activity_template_id,
@@ -190,7 +190,7 @@ function createActivityTemplateService(fastify) {
       }
     );
 
-    const outlet_ids = outletIsArr.map(val => val.outlet_id);
+    const node_ids = nodeIsArr.map(val => val.node_id);
 
     return updateExistingTemplate({
       activity_template_id,
@@ -211,7 +211,7 @@ function createActivityTemplateService(fastify) {
       updatedAudit,
       escalation,
       activity_evidences,
-      outlet_ids,
+      node_ids,
       logTrace
     });
   };

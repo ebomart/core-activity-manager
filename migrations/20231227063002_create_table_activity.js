@@ -8,7 +8,7 @@ exports.up = knex => {
           .defaultTo(knex.raw("uuid_generate_v4()"));
         table.uuid("activity_template_id");
         table.string("activity_name");
-        table.string("outlet_id");
+        table.string("node_id");
         table.date("activity_date");
         table.time("start_time");
         table.time("end_by_time");
@@ -24,7 +24,7 @@ exports.up = knex => {
         table.text("comments");
         table.jsonb("audit");
         table.index(["activity_template_id"], "indx_activity_template_id");
-        table.index(["outlet_id"], "indx_activity_outlet_id");
+        table.index(["node_id"], "indx_activity_node_id");
         table.index(["activity_date"], "indx_activity_date");
       });
     }

@@ -11,20 +11,20 @@ function getActivityTemplateByIdService(fastify) {
       activity_template_id,
       logTrace
     });
-    const publishedOutlets = await getAllOuletsByActiveTemplateId.call(
+    const publishedNodes = await getAllOuletsByActiveTemplateId.call(
       fastify.knex,
       {
         activity_template_id,
         logTrace
       }
     );
-    const published_outlet_ids = publishedOutlets.map(
-      outlet => outlet.outlet_id
+    const published_node_ids = publishedNodes.map(
+      node => node.node_id
     );
 
     return {
       ...response,
-      published_outlet_ids,
+      published_node_ids,
       start_from: momentTimezone(response.start_from).format("YYYY-MM-DD")
     };
   };

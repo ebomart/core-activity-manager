@@ -13,11 +13,11 @@ const SWAGGER_CONFIGS = {
     },
     servers: [
       {
-        url: "https://services-staging.kpnfarmfresh.com/activity-manager",
+        url: "https://services-staging.ibo.com/activity-manager",
         description: "Staging server"
       },
       {
-        url: "https://services.kpnfarmfresh.com/activity-manager",
+        url: "https://services.ibo.com/activity-manager",
         description: "Production server"
       }
     ],

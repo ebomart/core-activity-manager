@@ -18,7 +18,7 @@ const getActivityById = {
         activity_id: { type: "string" },
         activity_name: { type: "string" },
         activity_template_id: { type: "string" },
-        outlet_id: { type: "string" },
+        node_id: { type: "string" },
         activity_date: { type: "string" },
         start_time: { type: "string" },
         end_by_time: { type: "string" },

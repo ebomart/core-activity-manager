@@ -84,26 +84,26 @@ function activityRepo(fastify) {
     return query;
   }
 
-  async function getDistinctOutletIdsByActivityTemplateId({
+  async function getDistinctNodeIdsByActivityTemplateId({
     activity_template_id,
     logTrace
   }) {
     const knex = this;
     const query = knex(ACTIVITY.NAME)
-      .distinct(ACTIVITY.COLUMNS.OUTLET_ID)
+      .distinct(ACTIVITY.COLUMNS.NODE_ID)
       .where(ACTIVITY.COLUMNS.ACTIVITY_TEMPLATE_ID, activity_template_id);
     logQuery({
       logger: fastify.log,
       query,
-      context: "Get Outlet Ids By Activity Template ID",
+      context: "Get Node Ids By Activity Template ID",
       logTrace
     });
     return query;
   }
 
-  async function deleteFutureActivitiesByActivityTemplateIdAndOutletIds({
+  async function deleteFutureActivitiesByActivityTemplateIdAndNodeIds({
     activity_template_id,
-    outlet_ids,
+    node_ids,
     logTrace
   }) {
     const knex = this;
@@ -116,7 +116,7 @@ function activityRepo(fastify) {
       .whereRaw(
         `(${ACTIVITY.COLUMNS.ACTIVITY_START_DATETIME} > CURRENT_TIMESTAMP  OR to_char(${ACTIVITY.COLUMNS.ACTIVITY_DATE}, 'YYYY-MM-DD') = (TO_CHAR(CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD')))`
       )
-      .whereIn(ACTIVITY.COLUMNS.OUTLET_ID, outlet_ids);
+      .whereIn(ACTIVITY.COLUMNS.NODE_ID, node_ids);
     logQuery({
       logger: fastify.log,
       query,
@@ -130,7 +130,7 @@ function activityRepo(fastify) {
   async function getActivityListWithFilter({ input, logTrace }) {
     const knex = this;
     const {
-      outlet_id,
+      node_id,
       activity_date_from,
       activity_date_to,
       statuses,
@@ -160,8 +160,8 @@ function activityRepo(fastify) {
         `ACT.${ACTIVITY_TEMPALTE.COLUMNS.ACTIVITY_TEMPLATE_ID}`,
         `ACTV.${ACTIVITY.COLUMNS.ACTIVITY_TEMPLATE_ID}`
       );
-    if (outlet_id) {
-      query = query.where(`ACTV.${ACTIVITY.COLUMNS.OUTLET_ID}`, outlet_id);
+    if (node_id) {
+      query = query.where(`ACTV.${ACTIVITY.COLUMNS.NODE_ID}`, node_id);
     }
 
     if (statuses) {
@@ -203,7 +203,7 @@ function activityRepo(fastify) {
   async function getActivityListWithFilterByUserRole({ input, logTrace }) {
     const knex = this;
     const {
-      outlet_id,
+      node_id,
       activity_date_from,
       activity_date_to,
       user_roles,
@@ -247,8 +247,8 @@ function activityRepo(fastify) {
         queryForGettingActivityTemplateIdsByRole
       );
 
-    if (outlet_id) {
-      query = query.where(`ACTV.${ACTIVITY.COLUMNS.OUTLET_ID}`, outlet_id);
+    if (node_id) {
+      query = query.where(`ACTV.${ACTIVITY.COLUMNS.NODE_ID}`, node_id);
     }
 
     if (statuses) {
@@ -328,7 +328,7 @@ function activityRepo(fastify) {
   }) {
     const knex = this;
     const query = knex(ACTIVITY.NAME)
-      .distinct(ACTIVITY.COLUMNS.OUTLET_ID)
+      .distinct(ACTIVITY.COLUMNS.NODE_ID)
       .where(ACTIVITY.COLUMNS.ACTIVITY_TEMPLATE_ID, activity_template_id)
       .where(
         ACTIVITY.COLUMNS.ACTIVITY_START_DATETIME,
@@ -338,7 +338,7 @@ function activityRepo(fastify) {
     logQuery({
       logger: fastify.log,
       query,
-      context: "Get Outlet Ids By Activity Template ID",
+      context: "Get Node Ids By Activity Template ID",
       logTrace
     });
     return query;
@@ -347,7 +347,7 @@ function activityRepo(fastify) {
   async function getGroupedActivityListWithFilter({ input, logTrace }) {
     const knex = this;
     const {
-      outlet_id,
+      node_id,
       activity_date,
       statuses,
       // categories,
@@ -376,7 +376,7 @@ function activityRepo(fastify) {
         `ACT.${ACTIVITY_TEMPALTE.COLUMNS.ACTIVITY_TEMPLATE_ID}`,
         `ACTV.${ACTIVITY.COLUMNS.ACTIVITY_TEMPLATE_ID}`
       )
-      .where(`ACTV.${ACTIVITY.COLUMNS.OUTLET_ID}`, outlet_id)
+      .where(`ACTV.${ACTIVITY.COLUMNS.NODE_ID}`, node_id)
       .where(`ACTV.${ACTIVITY.COLUMNS.ACTIVITY_DATE}`, "=", activity_date);
 
     if (statuses) {
@@ -404,7 +404,7 @@ function activityRepo(fastify) {
   }) {
     const knex = this;
     const {
-      outlet_id,
+      node_id,
       activity_date,
       user_roles,
       statuses,
@@ -446,7 +446,7 @@ function activityRepo(fastify) {
         `ACTV.${ACTIVITY.COLUMNS.ACTIVITY_TEMPLATE_ID}`,
         queryForGettingActivityTemplateIdsByRole
       )
-      .where(`ACTV.${ACTIVITY.COLUMNS.OUTLET_ID}`, outlet_id)
+      .where(`ACTV.${ACTIVITY.COLUMNS.NODE_ID}`, node_id)
       .where(`ACTV.${ACTIVITY.COLUMNS.ACTIVITY_DATE}`, "=", activity_date);
     if (statuses) {
       query = query.whereIn(`ACTV.${ACTIVITY.COLUMNS.STATUS}`, statuses);
@@ -463,14 +463,14 @@ function activityRepo(fastify) {
   return {
     insertActivities,
     getActivitiesByActivityTemplateId,
-    deleteFutureActivitiesByActivityTemplateIdAndOutletIds,
+    deleteFutureActivitiesByActivityTemplateIdAndNodeIds,
     getActivityListWithFilter,
     updateActivityById,
     getActivityById,
     getActivityListWithFilterByUserRole,
     getPendingActivityListAboutToExpire,
     updateActivityAsExpiredIfNotCompleted,
-    getDistinctOutletIdsByActivityTemplateId,
+    getDistinctNodeIdsByActivityTemplateId,
     insertActivitiesInBatches,
     getAllOuletsByActiveTemplateId,
     getGroupedActivityListWithFilter,
